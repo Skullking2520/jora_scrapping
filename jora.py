@@ -72,7 +72,11 @@ def main():
             number_of_jobs = len(jobs)
             for job in jobs:
                 driver.execute_script("arguments[0].click();", job)
-                time.sleep(1)
+                try:
+                    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "h3.job-title.heading.-size-xxlarge.-weight-700")))
+                except TimeoutException:
+                    print("Panel did not load in time, skipping this job.")
+                    continue
 
                 try:
                     raw_job_title = driver.find_element(By.CSS_SELECTOR, "h3[class='job-title heading -size-xxlarge -weight-700']").text
