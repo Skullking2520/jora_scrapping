@@ -5,6 +5,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium import webdriver
 import time
 import gspread
+import os
 from google.oauth2.service_account import Credentials
 from collections import defaultdict
 from collections import Counter
@@ -20,7 +21,9 @@ options.add_argument("--disable-extensions")
 driver = webdriver.Chrome(options=options)
 
 def main():
-    key = 'orbital-bank-448101-m4-45ac7ee07c01.json'
+    key_path = "service_account.json"
+    if not os.path.exists(key_path):
+        raise FileNotFoundError("Service account key file not found!")
     scopes = [
         'https://www.googleapis.com/auth/spreadsheets',
         'https://www.googleapis.com/auth/drive'
