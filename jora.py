@@ -28,7 +28,7 @@ def main():
         'https://www.googleapis.com/auth/spreadsheets',
         'https://www.googleapis.com/auth/drive'
     ]
-    credentials = Credentials.from_service_account_file(key, scopes=scopes)
+    credentials = Credentials.from_service_account_file(key_path, scopes=scopes)
     gc = gspread.authorize(credentials)
     spreadsheet_url = "https://docs.google.com/spreadsheets/d/1iFZ71DNkAtlJL_HsHG6oT98zG4zhE6RrT2bbIBVitUA/edit?gid=0#gid=0"
     sh = gc.open_by_url(spreadsheet_url)
