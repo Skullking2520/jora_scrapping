@@ -9,7 +9,6 @@ import os
 from google.oauth2.service_account import Credentials
 from collections import defaultdict
 from collections import Counter
-import logging
 
 user_agent=f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
 options = webdriver.ChromeOptions()
