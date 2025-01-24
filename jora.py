@@ -20,9 +20,13 @@ options.add_argument("--disable-extensions")
 driver = webdriver.Chrome(options=options)
 
 def main():
-    key_path = os.environ.get("SERVICE_ACCOUNT_KEY", "service_account.json")
-    if not os.path.exists(key_path):
-        raise FileNotFoundError("Service account key file not found!")
+    key_content = os.environ.get("SERVICE_ACCOUNT_KEY")
+    if not key_content:
+        raise FileNotFoundError("Service account key content not found in environment variable!")
+
+    key_path = "service_account.json"
+    with open(key_path, "w") as f:
+        f.write(key_content)
 
     scopes = [
         'https://www.googleapis.com/auth/spreadsheets',
