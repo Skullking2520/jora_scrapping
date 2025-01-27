@@ -112,7 +112,9 @@ def main():
                     job_link = job_link_data.get_attribute("href")
                     job_title = f'=HYPERLINK("{job_link}", "{raw_job_title}")'
                 except NoSuchElementException:
+                    raw_job_title = "No job title"
                     job_title = "No job title"
+
 
                 try:
                     job_code = driver.find_element(By.CSS_SELECTOR,"button[class = 'save-job-button rounded-button -secondary -size-lg']").get_attribute("data-job-id")
