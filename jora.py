@@ -27,15 +27,10 @@ def open_ai(job:str, desc:str)->str:
                 f"No additional explanation is needed. Just give the Job Category."
                 f"example: 'Hospitality', 'IT', 'Customer Service', 'Healthcare', 'Retail', 'Construction' etc")
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant for job categorization."},
-                {"role": "user", "content": question},
-            ],
-            temperature=0.0,
-            max_tokens=30
-        )
+        response = openai.chat.completions.create(model="gpt-3.5-turbo",
+                                            messages=[
+                                                {"role": "system", "content": "You are a helpful assistant for job categorization."},
+                                                {"role": "user", "content": question}],temperature=0.0,max_tokens=30)
         job_category = response.choices[0].message.content.strip()
     except Exception as e:
         job_category = f"Error: {str(e)}"
