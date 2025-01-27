@@ -67,12 +67,11 @@ def main():
 
     sheet_name = "Sheet1"
     worksheet = sh.worksheet(sheet_name)
-    worksheet.resize(rows=20000)
     worksheet.clear()
     worksheet.append_row(["job_code", "job_title", "job_link", "company", "location", "salary", "job_type", "etc", "job_category", "description"])
 
-    sheet_3_name = "Sheet2"
-    summary = sh.worksheet(sheet_3_name)
+    sheet_2_name = "Sheet2"
+    summary = sh.worksheet(sheet_2_name)
     summary.clear()
     summary.append_row(["number_of_jobs", "number_of_pages", "number_of_email_notifications", "number_of_ads"])
 
