@@ -1,14 +1,46 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as EC # noqa
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium import webdriver
 import time
 import gspread
-import os
-from google.oauth2.service_account import Credentials
+from google.oauth2.service_account import Credentials # noqa
 from collections import defaultdict
 from collections import Counter
+import openai
+import os
+
+def open_ai(job:str, desc:str)->str:
+    openai_api_key = os.environ.get("OPENAI_API_KEY", "")
+    openai.api_key = openai_api_key
+
+    if not openai_api_key:
+        return "No API Key"
+        
+    question = (f"The following details are a part of a job posting."
+                f"1) job title: {job}"
+                f"2) description: {desc}"
+                f""
+                f"You are required to give out the category of the job in one keyword depending on the provided information."
+                f"If description is empty, find the category based on job title. If both are empty, give no answer."
+                f"No additional explanation is needed. Just give the Job Category."
+                f"example: 'Hospitality', 'IT', 'Customer Service', 'Healthcare', 'Retail', 'Construction' etc")
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant for job categorization."},
+                {"role": "user", "content": question},
+            ],
+            temperature=0.0,
+            max_tokens=30
+        )
+        job_category = response.choices[0].message.content.strip()
+    except Exception as e:
+        job_category = f"Error: {str(e)}"
+
+    return job_category
 
 user_agent=f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
 options = webdriver.ChromeOptions()
@@ -42,7 +74,8 @@ def main():
     worksheet = sh.worksheet(sheet_name)
     worksheet.resize(rows=20000)
     worksheet.clear()
-    worksheet.append_row(["job_code", "job_title", "company", "location", "salary", "job_type", "etc", "description"])
+    worksheet.append_row([
+        "job_code", "job_title", "job_link", "company", "location", "salary", "job_type", "etc", "job_category", "description"])
 
     sheet_3_name = "Sheet2"
     summary = sh.worksheet(sheet_3_name)
@@ -157,6 +190,8 @@ def main():
                 except NoSuchElementException:
                     desc_string = "No description given"
 
+                job_category = open_ai(raw_job_title, desc_string)
+
                 job_data = [job_code,
                             job_title,
                             company,
@@ -164,6 +199,7 @@ def main():
                             salary,
                             job_type,
                             etc,
+                            job_category,
                             desc_string]
                 worksheet.append_row(job_data, value_input_option="USER_ENTERED")
                 seen_jobs.add((raw_job_title.lower(), company.lower()))
