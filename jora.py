@@ -69,8 +69,7 @@ def main():
     worksheet = sh.worksheet(sheet_name)
     worksheet.resize(rows=20000)
     worksheet.clear()
-    worksheet.append_row([
-        "job_code", "job_title", "job_link", "company", "location", "salary", "job_type", "etc", "job_category", "description"])
+    worksheet.append_row(["job_code", "job_title", "job_link", "company", "location", "salary", "job_type", "etc", "job_category", "description"])
 
     sheet_3_name = "Sheet2"
     summary = sh.worksheet(sheet_3_name)
@@ -188,6 +187,7 @@ def main():
                 job_category = open_ai(raw_job_title, desc_string)
 
                 job_data = [job_code,
+                            raw_job_title,
                             job_title,
                             company,
                             location,
