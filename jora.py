@@ -106,13 +106,12 @@ def main():
                     continue
 
                 try:
-                    raw_job_title = driver.find_element(By.CSS_SELECTOR, "h3[class='job-title heading -size-xxlarge -weight-700']").text
+                    job_title = driver.find_element(By.CSS_SELECTOR, "h3[class='job-title heading -size-xxlarge -weight-700']").text
                     job_link_data = driver.find_element(By.CSS_SELECTOR, "a[class = 'open-new-tab -link-cool']")
                     job_link = job_link_data.get_attribute("href")
-                    job_title = f'=HYPERLINK("{job_link}", "{raw_job_title}")'
                 except NoSuchElementException:
-                    raw_job_title = "No job title"
                     job_title = "No job title"
+                    job_link = "No job link"
 
 
                 try:
@@ -126,8 +125,8 @@ def main():
                 except NoSuchElementException:
                     company = "No company data"
 
-                if (raw_job_title.strip().lower(), company.strip().lower()) in seen_jobs:
-                    print(f"Duplicate found, skipping: {company}, {raw_job_title}")
+                if (job_title.strip().lower(), company.strip().lower()) in seen_jobs:
+                    print(f"Duplicate found, skipping: {company}, {job_title}")
                     continue
 
                 try:
@@ -185,11 +184,16 @@ def main():
                 except NoSuchElementException:
                     desc_string = "No description given"
 
-                job_category = open_ai(raw_job_title, desc_string)
+                if job_link != "No job link":
+                    job_hyper_link = f'=HYPERLINK("{job_link}", "{job_link}")'
+                else:
+                    job_hyper_link = job_link
+
+                job_category = open_ai(job_title, desc_string)
 
                 job_data = [job_code,
-                            raw_job_title,
                             job_title,
+                            job_hyper_link,
                             company,
                             location,
                             salary,
@@ -198,7 +202,7 @@ def main():
                             job_category,
                             desc_string]
                 worksheet.append_row(job_data, value_input_option="USER_ENTERED")
-                seen_jobs.add((raw_job_title.lower(), company.lower()))
+                seen_jobs.add((job_title.lower(), company.lower()))
                 time.sleep(1)
 
             try:
