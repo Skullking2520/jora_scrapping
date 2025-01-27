@@ -202,6 +202,7 @@ def main():
                             job_category,
                             desc_string]
                 worksheet.append_row(job_data, value_input_option="USER_ENTERED")
+                time.sleep(2)
                 seen_jobs.add((job_title.lower(), company.lower()))
                 time.sleep(1)
 
@@ -222,12 +223,10 @@ def main():
                     try:
                         ads = WebDriverWait(driver, 20).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[class*='clicktrackedAd_js']")))
                         number_of_ads += len(ads)
-                    except TimeoutException as e:
-                        print(e)
+                    except TimeoutException:
                         pass
                     driver.switch_to.default_content()
-            except NoSuchElementException as e:
-                print(e)
+            except NoSuchElementException:
                 pass
 
             report_data = [number_of_jobs,
