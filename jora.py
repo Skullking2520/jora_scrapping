@@ -69,8 +69,8 @@ def set_seen_jobs_data_sheet():
     return worksheet
 
 def save_seen_jobs_data(worksheet, seen_jobs):
-    for job_title, company in seen_jobs:
-        worksheet.append_row([job_title, company])
+    rows = [[job_title, company] for job_title, company in seen_jobs]
+    worksheet.append_rows(rows, value_input_option="USER_ENTERED")
 
 def load_seen_jobs_data(worksheet) -> set[tuple[str, str]]:
     seen_jobs = set()
