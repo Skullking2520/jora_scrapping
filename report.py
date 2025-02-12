@@ -63,14 +63,14 @@ def load_report_data(worksheet) -> list[list[int]]:
 
 def main():
     process_sheet = web_sheet.get_worksheet("Progress")
+    sheet2 = web_sheet.get_worksheet("Sheet2")
+    report_sheet = web_sheet.get_worksheet("ReportData")
+    report = load_report_data(report_sheet)
     ph = ProcessHandler(process_sheet, {"Processing": False, "UrlNum": 1}, "A3", shutdown_callback=lambda: save_report_data(report_sheet, report))
     progress = ph.load_progress()
     if not progress["Processing"]:
         set_sheet2()
         set_report_sheet()
-    sheet2 = web_sheet.get_worksheet("Sheet2")
-    report_sheet = web_sheet.get_worksheet("ReportData")
-    report = load_report_data(report_sheet)
     progress["Processing"] = True
     while progress["Processing"]:
         try:
@@ -152,13 +152,13 @@ def main():
     for row in summary_raw_data:
         append_row_with_retry(sheet2, row)
 
-    driver.quit()
     save_report_data(report_sheet, report)
     progress["Processing"] = False
     progress["UrlNum"] = 1
     ph.save_progress(progress)
     process_sheet.update("A1", [[json.dumps({"progress":"setting", "UrlNum":1})]])
     process_sheet.update("A2", [[json.dumps({"finished": False, "RowNum": 1})]])
+    driver.quit()
     print("Saved every data into the Google Sheet successfully.")
 
 if __name__ == "__main__":
