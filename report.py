@@ -80,7 +80,8 @@ def main():
             driver.get(url)
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
-
+            print(f"Current page: {url}")
+            
             try:
                 driver.find_element(By.CSS_SELECTOR, "a[class='next-page-button']")
             except NoSuchElementException:
