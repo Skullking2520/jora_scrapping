@@ -78,17 +78,39 @@ def load_detail_data(worksheet) -> list[list[str]]:
                 continue
     return report
 
-def is_first_execution(progress_sheet):
-    progress_value = progress_sheet.acell("A3").value
-    return not progress_value or progress_value.strip() == ""
+def batch_update_cells(worksheet, row_num, updates):
+    sheet_id = getattr(worksheet, 'id', None) or worksheet._properties.get('sheetId')
+    requests = []
+
+    for col, value in updates:
+        requests.append({
+            "updateCells": {
+                "range": {
+                    "sheetId": sheet_id,
+                    "startRowIndex": row_num - 1,
+                    "endRowIndex": row_num,
+                    "startColumnIndex": col - 1,
+                    "endColumnIndex": col
+                },
+                "rows": [{
+                    "values": [{
+                        "userEnteredValue": {"stringValue": str(value)}
+                    }]
+                }],
+                "fields": "userEnteredValue"
+            }
+        })
+
+    body = {"requests": requests}
+    worksheet.spreadsheet.batch_update(body)
 
 def main():
     process_sheet = web_sheet.get_worksheet("Progress")
-    if is_first_execution(process_sheet):
+    ph = ProcessHandler(process_sheet, {"progress":"setting", "RowNum": 1}, "A2")
+    progress = ph.load_progress()
+    if progress["progress"] == "setting":
         set_detail_sheet()
     sheet1 = web_sheet.get_worksheet("Sheet1")
-    ph = ProcessHandler(process_sheet, {"finished": False, "RowNum": 1}, "A3")
-    progress = ph.load_progress()
     extracted_list = extract()
 
     sheet1_header = sheet1.row_values(1)
@@ -101,8 +123,9 @@ def main():
         print("Column not in sheet")
         return
 
-    while not progress["finished"]:
+    while not progress["progress"] == "finished":
         try:
+            progress["progress"] = "processing"
             while progress["RowNum"] < len(extracted_list):
                 row_and_index = extracted_list[progress["RowNum"]]
                 row_num = row_and_index["link_row_num"]
@@ -137,10 +160,13 @@ def main():
                 else:
                     seek_link = ""
 
-                sheet1.update_cell(row_num, col_company_website, company_website)
-                sheet1.update_cell(row_num, col_is_active, "Active" if is_active else "Inactive")
-                sheet1.update_cell(row_num, col_seek_link, seek_link)
-                sheet1.update_cell(row_num, col_is_from_seek, str(is_from_seek))
+               updates = [
+                    (col_company_website, company_website),
+                    (col_is_active, "Active" if is_active else "Inactive"),
+                    (col_seek_link, seek_link),
+                    (col_is_from_seek, str(is_from_seek))
+                ]
+                batch_update_cells(sheet1, row_num, updates)
 
                 progress["RowNum"] += 1
         except NoSuchElementException as e:
@@ -148,7 +174,7 @@ def main():
                 continue
 
     driver.quit()
-    progress["finished"] = True
+    progress["progress"] = "finished"
     ph.save_progress(progress)
     print("Saved every data into the Google Sheet successfully.")
 
