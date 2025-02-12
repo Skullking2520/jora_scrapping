@@ -55,12 +55,13 @@ def extract():
         return
 
     all_rows = sheet1.get_all_values()[1:]
-
     link_list = []
 
     for row_num, row in enumerate(all_rows, start=2):
         link = row[link_idx - 1] if len(row) >= link_idx else ""
         detail_url = remove_hyperlink(link)
+        if not detail_url:
+            break
         link_list.append({"link_row_num":row_num, "detail_url":detail_url})
     return link_list
 
@@ -163,6 +164,7 @@ def main():
                 batch_update_cells(sheet1, row_num, updates)
 
                 progress["RowNum"] += 1
+            progress["progress"] = "finished"
         except NoSuchElementException as e:
                 print(f"Error processing job: {e}")
                 continue
