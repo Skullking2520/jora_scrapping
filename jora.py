@@ -16,29 +16,29 @@ web_sheet = Sheet()
 driver = web_sheet.set_driver()
 
     # function for use of generative AI to differentiate job category using job title and description
-def open_ai(job:str, desc:str)->str:
-    # To use this in GitHub action, key secrecy is required
+# def open_ai(job:str, desc:str)->str:
+#     # To use this in GitHub action, key secrecy is required
 
-    openai_api_key = os.environ.get("OPENAI_API_KEY", "")
-    openai.api_key = openai_api_key
+#     openai_api_key = os.environ.get("OPENAI_API_KEY", "")
+#     openai.api_key = openai_api_key
 
-    if not openai_api_key:
-        return "No API Key"
+#     if not openai_api_key:
+#         return "No API Key"
 
-    question = (f"The following details are a part of a job posting."
-                f"1) job title: {job}"
-                f"2) description: {desc}"
-                f""
-                f"You are required to give out the category of the job in one keyword depending on the provided information."
-                f"If description is empty, find the category based on job title. If both are empty, give no answer."
-                f"No additional explanation is needed. Just give the Job Category."
-                f"example: 'Hospitality', 'IT', 'Customer Service', 'Healthcare', 'Retail', 'Construction' etc")
-    response = openai.chat.completions.create(model="gpt-3.5-turbo",
-                                            messages=[
-                                                {"role": "system", "content": "You are a helpful assistant for job categorization."},
-                                                {"role": "user", "content": question}],temperature=0.0,max_tokens=30)
-    job_category = response.choices[0].message.content.strip()
-    return job_category
+#     question = (f"The following details are a part of a job posting."
+#                 f"1) job title: {job}"
+#                 f"2) description: {desc}"
+#                 f""
+#                 f"You are required to give out the category of the job in one keyword depending on the provided information."
+#                 f"If description is empty, find the category based on job title. If both are empty, give no answer."
+#                 f"No additional explanation is needed. Just give the Job Category."
+#                 f"example: 'Hospitality', 'IT', 'Customer Service', 'Healthcare', 'Retail', 'Construction' etc")
+#     response = openai.chat.completions.create(model="gpt-3.5-turbo",
+#                                             messages=[
+#                                                 {"role": "system", "content": "You are a helpful assistant for job categorization."},
+#                                                 {"role": "user", "content": question}],temperature=0.0,max_tokens=30)
+#     job_category = response.choices[0].message.content.strip()
+#     return job_category
 
 
 def append_row_with_retry(worksheet, data, retries=3, delay=5):
@@ -47,11 +47,13 @@ def append_row_with_retry(worksheet, data, retries=3, delay=5):
             worksheet.append_row(data, value_input_option="USER_ENTERED")
             return
         except gspread.exceptions.APIError as e:
-            if "503" in str(e):
-                print(f"Error 503 occurred. Retry after {delay}seconds ({attempt+1}/{retries})")
+            if any(code in str(e) for code in ["500", "502", "503", "504","429"]) or isinstance(e, ReadTimeout):
+                print(f"Error occurred. Retry after {delay} seconds ({attempt+1}/{retries})")
                 time.sleep(delay)
+                delay *= 2
             else:
-                raise
+                print(f"Failed to append element {data} after {retries} attempts.")
+                return
 
 def set_sheet1():
     worksheet = web_sheet.get_worksheet("Sheet1")
@@ -218,8 +220,9 @@ def main():
                     job_hyper_link = f'=HYPERLINK("{job_link}", "{job_link}")'
                 else:
                     job_hyper_link = job_link
-
-                job_category = open_ai(job=job_title, desc=desc_string)
+                    
+                job_category = ""
+                # job_category = open_ai(job=job_title, desc=desc_string)
 
                 job_data = [job_code,
                             job_title,
