@@ -71,15 +71,15 @@ def main():
     if not progress["Processing"]:
         set_sheet2()
         set_report_sheet()
-    progress["Processing"] = True
-    while progress["Processing"]:
+    
+    while True:
         try:
+            progress["Processing"] = True
             url = f"https://au.jora.com/j?a=24h&l=Victoria&nofollow=true&p={progress['UrlNum']}&q=&r=0&sp=facet_distance&surl=0&tk=DE7LtoGm3BJx78CQKKAl-x1Ir1keUvqhw6PY4ybZ7"
             driver.get(url)
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
             print(f"Current page: {url}")
-            
             try:
                 driver.find_element(By.CSS_SELECTOR, "a[class='next-page-button']")
             except NoSuchElementException:
