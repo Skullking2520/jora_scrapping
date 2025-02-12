@@ -100,17 +100,26 @@ def main():
             try:
                 iframes = driver.find_elements(By.TAG_NAME, "iframe")
                 number_of_ads = 0
-                for iframe in iframes:
-                    driver.switch_to.frame(iframe)
-                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                    time.sleep(1)
+                for i in range(len(iframes)):
+                    iframes = driver.find_elements(By.TAG_NAME, "iframe")
                     try:
-                        ads = WebDriverWait(driver, 20).until(
-                            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[class*='clicktrackedAd_js']")))
-                        number_of_ads += len(ads)
-                    except TimeoutException:
-                        pass
-                    driver.switch_to.default_content()
+                        iframe = iframes[i]
+                    except IndexError:
+                        continue
+                    try:
+                        driver.switch_to.frame(iframe)
+                        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                        time.sleep(1)
+                        try:
+                            ads = WebDriverWait(driver, 20).until(
+                                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[class*='clicktrackedAd_js']")))
+                            number_of_ads += len(ads)
+                        except TimeoutException:
+                            pass
+                    except Exception as e:
+                        print(f"error during switching to iframe: {e}")
+                    finally:
+                        driver.switch_to.default_content()
             except NoSuchElementException:
                 number_of_ads = 0
                 pass
