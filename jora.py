@@ -100,15 +100,15 @@ def load_seen_jobs_data(worksheet) -> set[tuple[str, str]]:
 # main function where scrapping and Google Docs addition is done
 def main():
     process_sheet = web_sheet.get_worksheet("Progress")
+    sheet1 = web_sheet.get_worksheet("Sheet1")
+    seen_sheet = web_sheet.get_worksheet("JobData")
+    load_to_seen_data()
+    seen_jobs = load_seen_jobs_data(seen_sheet)
     ph = ProcessHandler(process_sheet, {"progress":"setting", "UrlNum":1}, "A1", shutdown_callback=lambda: save_seen_jobs_data(seen_sheet, seen_jobs))
     progress = ph.load_progress()
     if progress["progress"] == "setting":
         set_sheet1()
         set_seen_jobs_data_sheet()
-    sheet1 = web_sheet.get_worksheet("Sheet1")
-    seen_sheet = web_sheet.get_worksheet("JobData")
-    load_to_seen_data()
-    seen_jobs = load_seen_jobs_data(seen_sheet)
     
     while not progress["progress"] == "finished":
         try:
@@ -121,6 +121,8 @@ def main():
             try:
                 driver.find_element(By.CSS_SELECTOR, "a[class='next-page-button']")
             except NoSuchElementException:
+                progress["progress"] = "finished"
+                ph.save_progress(progress)
                 print("Finished scrapping")
                 break
 
@@ -257,16 +259,13 @@ def main():
                 append_row_with_retry(sheet1, job_data)
                 seen_jobs.add((job_title.lower(), company.lower()))
                 time.sleep(1)
-            progress["progress"] = "finished"
-            ph.save_progress(progress)
+            
         except NoSuchElementException as e:
             print(f"Error processing job: {e}")
             continue
 
-    driver.quit()
     set_seen_jobs_data_sheet()
-    progress["progress"] = "finished"
-    ph.save_progress(progress)
+    driver.quit()
     print("Saved every data into the Google Sheet successfully.")
 
 if __name__ == "__main__":
