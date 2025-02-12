@@ -131,6 +131,7 @@ def main():
             report.append(report_data)
         except NoSuchElementException as e:
             print(f"Error processing job: {e}")
+            progress["UrlNum"] += 1
             continue
 
     report_raw_data = defaultdict(list)
