@@ -97,24 +97,22 @@ def load_seen_jobs_data(worksheet) -> set[tuple[str, str]]:
             seen_jobs.add((job_title, company))
     return seen_jobs
 
-def is_first_execution(progress_sheet):
-    progress_value = progress_sheet.acell("A1").value
-    return not progress_value or progress_value.strip() == ""
-
 # main function where scrapping and Google Docs addition is done
 def main():
     process_sheet = web_sheet.get_worksheet("Progress")
-    if is_first_execution(process_sheet):
+    ph = ProcessHandler(process_sheet, {"progress":"setting", "UrlNum":1}, "A1", shutdown_callback=lambda: save_seen_jobs_data(seen_sheet, seen_jobs))
+    progress = ph.load_progress()
+    if progress["progress"] == "setting":
         set_sheet1()
         set_seen_jobs_data_sheet()
     sheet1 = web_sheet.get_worksheet("Sheet1")
     seen_sheet = web_sheet.get_worksheet("JobData")
     load_to_seen_data()
     seen_jobs = load_seen_jobs_data(seen_sheet)
-    ph = ProcessHandler(process_sheet, {"finished":False,"UrlNum":1}, "A1", shutdown_callback=lambda: save_seen_jobs_data(seen_sheet, seen_jobs))
-    progress = ph.load_progress()
-    while not progress["finished"]:
+    
+    while not progress["progress"] == "finished":
         try:
+            progress["progress"] = "progressing"
             url = f"https://au.jora.com/j?a=24h&l=Victoria&nofollow=true&p={progress['UrlNum']}&q=&r=0&sp=facet_distance&surl=0&tk=DE7LtoGm3BJx78CQKKAl-x1Ir1keUvqhw6PY4ybZ7"
             driver.get(url)
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -259,14 +257,15 @@ def main():
                 append_row_with_retry(sheet1, job_data)
                 seen_jobs.add((job_title.lower(), company.lower()))
                 time.sleep(1)
-
+            progress["progress"] = "finished"
+            ph.save_progress(progress)
         except NoSuchElementException as e:
             print(f"Error processing job: {e}")
             continue
 
     driver.quit()
     set_seen_jobs_data_sheet()
-    progress["finished"] = True
+    progress["progress"] = "finished"
     ph.save_progress(progress)
     print("Saved every data into the Google Sheet successfully.")
 
