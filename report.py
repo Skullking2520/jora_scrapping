@@ -61,21 +61,18 @@ def load_report_data(worksheet) -> list[list[int]]:
                 continue
     return report
 
-def is_first_execution(progress_sheet):
-    progress_value = progress_sheet.acell("A2").value
-    return not progress_value or progress_value.strip() == ""
-
 def main():
     process_sheet = web_sheet.get_worksheet("Progress")
-    if is_first_execution(process_sheet):
+    ph = ProcessHandler(process_sheet, {"Processing": False, "UrlNum": 1}, "A3", shutdown_callback=lambda: save_report_data(report_sheet, report))
+    progress = ph.load_progress()
+    if not progress["Processing"]:
         set_sheet2()
         set_report_sheet()
     sheet2 = web_sheet.get_worksheet("Sheet2")
     report_sheet = web_sheet.get_worksheet("ReportData")
     report = load_report_data(report_sheet)
-    ph = ProcessHandler(process_sheet, {"finished": False, "UrlNum": 1}, "A2", shutdown_callback=lambda: save_report_data(report_sheet, report))
-    progress = ph.load_progress()
-    while not progress["finished"]:
+    progress["Processing"] = True
+    while progress["Processing"]:
         try:
             url = f"https://au.jora.com/j?a=24h&l=Victoria&nofollow=true&p={progress['UrlNum']}&q=&r=0&sp=facet_distance&surl=0&tk=DE7LtoGm3BJx78CQKKAl-x1Ir1keUvqhw6PY4ybZ7"
             driver.get(url)
@@ -157,8 +154,11 @@ def main():
 
     driver.quit()
     save_report_data(report_sheet, report)
-    progress["finished"] = True
+    progress["Processing"] = False
+    progress["UrlNum"] = 1
     ph.save_progress(progress)
+    process_sheet.update("A1", [[json.dumps({"progress":"setting", "UrlNum":1})]])
+    process_sheet.update("A2", [[json.dumps({"finished": False, "RowNum": 1})]])
     print("Saved every data into the Google Sheet successfully.")
 
 if __name__ == "__main__":
