@@ -5,6 +5,8 @@ on:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   run-jora:
@@ -47,9 +49,36 @@ jobs:
       run: |
         python jora.py
         
+  run-jora-detail:
+    needs: 
+      - run-jora
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.x"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run occ_vac compiling
+      env:
+        SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+      run: |
+        python jora_detail.py
+        
   run-report:
-    runs-on: [self-hosted, runner]
-    timeout-minutes: 0
+    needs: 
+      - run-jora
+      - run-jora-detail
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
@@ -73,28 +102,4 @@ jobs:
       run: |
         python report.py
     
-  run-jora-detail:
-    needs: 
-      - run-jora
-      - run-report
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    
-    - name: Run occ_vac compiling
-      env:
-        SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-      run: |
-        python jora_detail.py
+
