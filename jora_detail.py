@@ -19,11 +19,13 @@ def append_row_with_retry(worksheet, data, retries=3, delay=5):
             worksheet.append_row(data, value_input_option="USER_ENTERED")
             return
         except gspread.exceptions.APIError as e:
-            if "503" in str(e):
-                print(f"Error 503 occurred. Retry after {delay}seconds ({attempt+1}/{retries})")
+            if any(code in str(e) for code in ["500", "502", "503", "504","429"]) or isinstance(e, ReadTimeout):
+                print(f"Error occurred. Retry after {delay} seconds ({attempt+1}/{retries})")
                 time.sleep(delay)
+                delay *= 2
             else:
-                raise
+                print(f"Failed to append element {data} after {retries} attempts.")
+                return
 
 def set_detail_sheet():
     worksheet = web_sheet.get_worksheet("DetailData")
@@ -115,7 +117,7 @@ def main():
                     is_from_seek = False
 
                 try:
-                    raw_company_website = driver.find_element(By.CSS_SELECTOR,"a[class = 'apply-button rounded-button -primary -size-lg -w-ful']")
+                    raw_company_website = driver.find_element(By.CSS_SELECTOR,"a[class = 'apply-button rounded-button -primary -size-lg -w-full']")
                     base_url = "https://au.jora.com"
                     raw_link = raw_company_website.get_attribute("href")
                     company_website = base_url + raw_link
@@ -145,7 +147,8 @@ def main():
                 continue
 
     driver.quit()
-    process_sheet.clear()
+    progress["finished"] = True
+    ph.save_progress(progress)
     print("Saved every data into the Google Sheet successfully.")
 
 if __name__ == "__main__":
