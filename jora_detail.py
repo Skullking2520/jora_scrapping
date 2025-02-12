@@ -106,13 +106,12 @@ def batch_update_cells(worksheet, row_num, updates):
 
 def main():
     process_sheet = web_sheet.get_worksheet("Progress")
+    sheet1 = web_sheet.get_worksheet("Sheet1")
+    extracted_list = extract()
     ph = ProcessHandler(process_sheet, {"progress":"setting", "RowNum": 1}, "A2")
     progress = ph.load_progress()
     if progress["progress"] == "setting":
         set_detail_sheet()
-    sheet1 = web_sheet.get_worksheet("Sheet1")
-    extracted_list = extract()
-
     sheet1_header = sheet1.row_values(1)
     try:
         col_company_website = sheet1_header.index("company website") + 1
@@ -160,12 +159,10 @@ def main():
                 else:
                     seek_link = ""
 
-               updates = [
-                    (col_company_website, company_website),
+               updates = [(col_company_website, company_website),
                     (col_is_active, "Active" if is_active else "Inactive"),
                     (col_seek_link, seek_link),
-                    (col_is_from_seek, str(is_from_seek))
-                ]
+                    (col_is_from_seek, str(is_from_seek))]
                 batch_update_cells(sheet1, row_num, updates)
 
                 progress["RowNum"] += 1
@@ -173,9 +170,9 @@ def main():
                 print(f"Error processing job: {e}")
                 continue
 
-    driver.quit()
     progress["progress"] = "finished"
     ph.save_progress(progress)
+    driver.quit()
     print("Saved every data into the Google Sheet successfully.")
 
 if __name__ == "__main__":
