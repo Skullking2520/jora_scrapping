@@ -8,6 +8,7 @@ import gspread
 import openai
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+from requests import ReadTimeout
 
 from google_form_package import Sheet
 from process_handler import ProcessHandler
@@ -68,6 +69,20 @@ def set_seen_jobs_data_sheet():
     worksheet.append_row(headers)
     return worksheet
 
+def load_to_seen_data():
+    sheet1 = web_sheet.get_worksheet("Sheet1")
+    sheet1_data = sheet1.get_all_values()
+    prepopulated_rows = []
+    for row in sheet1_data[1:]:
+        if len(row) >= 4:
+            job_title = row[1].strip()
+            company = row[3].strip()
+            if job_title and company:
+                prepopulated_rows.append([job_title, company])
+    job_data_sheet = web_sheet.get_worksheet("JobData")
+    if prepopulated_rows:
+        job_data_sheet.append_rows(prepopulated_rows, value_input_option="USER_ENTERED")
+
 def save_seen_jobs_data(worksheet, seen_jobs):
     rows = [[job_title, company] for job_title, company in seen_jobs]
     worksheet.append_rows(rows, value_input_option="USER_ENTERED")
@@ -94,6 +109,7 @@ def main():
         set_seen_jobs_data_sheet()
     sheet1 = web_sheet.get_worksheet("Sheet1")
     seen_sheet = web_sheet.get_worksheet("JobData")
+    load_to_seen_data()
     seen_jobs = load_seen_jobs_data(seen_sheet)
     ph = ProcessHandler(process_sheet, {"finished":False,"UrlNum":1}, "A1", shutdown_callback=lambda: save_seen_jobs_data(seen_sheet, seen_jobs))
     progress = ph.load_progress()
@@ -249,7 +265,7 @@ def main():
             continue
 
     driver.quit()
-    save_seen_jobs_data(seen_sheet, seen_jobs)
+    set_seen_jobs_data_sheet()
     progress["finished"] = True
     ph.save_progress(progress)
     print("Saved every data into the Google Sheet successfully.")
