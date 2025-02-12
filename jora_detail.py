@@ -159,7 +159,7 @@ def main():
                 else:
                     seek_link = ""
 
-               updates = [(col_company_website, company_website),(col_is_active, "Active" if is_active else "Inactive"),(col_seek_link, seek_link),(col_is_from_seek, str(is_from_seek))]
+                updates = [(col_company_website, company_website),(col_is_active, "Active" if is_active else "Inactive"),(col_seek_link, seek_link),(col_is_from_seek, str(is_from_seek))]
                 batch_update_cells(sheet1, row_num, updates)
 
                 progress["RowNum"] += 1
