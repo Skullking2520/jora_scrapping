@@ -96,11 +96,7 @@ def main():
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
             print(f"Current page: {url}")
-            try:
-                driver.find_element(By.CSS_SELECTOR, "a[class='next-page-button']")
-            except NoSuchElementException:
-                print("Finished scrapping")
-                break
+           
 
             print(f"current page: {url}")
             progress["UrlNum"] += 1
@@ -145,6 +141,12 @@ def main():
                            number_of_email_notifications,
                            number_of_ads]
             report.append(report_data)
+
+            try:
+                driver.find_element(By.CSS_SELECTOR, "a[class='next-page-button']")
+            except NoSuchElementException:
+                print("Finished scrapping")
+                break
         except NoSuchElementException as e:
             print(f"Error processing job: {e}")
             progress["UrlNum"] += 1
