@@ -44,9 +44,24 @@ def set_report_sheet():
     worksheet.append_row(headers)
     return worksheet
 
+def num_to_col(n):
+    result = ''
+    while n:
+        n, remainder = divmod(n - 1, 26)
+        result = chr(65 + remainder) + result
+    return result
+
 def save_report_data(worksheet, report):
-    for number_of_jobs, number_of_email_notifications, number_of_ads in report:
-        worksheet.append_row([number_of_jobs, number_of_email_notifications, number_of_ads])
+    values = [[number_of_jobs, number_of_email_notifications, number_of_ads]
+              for number_of_jobs, number_of_email_notifications, number_of_ads in report]
+    if not values:
+        return
+    start_row = 2
+    num_rows = len(values)
+    num_cols = len(values[0])
+    end_col = num_to_col(num_cols)
+    cell_range = f"A{start_row}:{end_col}{start_row + num_rows - 1}"
+    worksheet.update(cell_range, values, value_input_option="USER_ENTERED")
 
 def load_report_data(worksheet) -> list[list[int]]:
     report = []
