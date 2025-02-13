@@ -23,7 +23,7 @@ class ProcessHandler:
             return progress
         except Exception:
             print("Failed to load progress, finishing program")
-            return {"finished": True}
+            return self.init_value
 
     def save_progress(self, progress):
         try:
