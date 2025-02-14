@@ -103,7 +103,6 @@ def main():
     sheet1 = web_sheet.get_worksheet("Sheet1")
     seen_sheet = web_sheet.get_worksheet("JobData")
     sheet1.resize(cols=17)
-    sheet1.update([["Running Scrapping"]], "Q2")
     load_to_seen_data()
     seen_jobs = load_seen_jobs_data(seen_sheet)
     ph = ProcessHandler(process_sheet, {"progress":"setting", "UrlNum":1}, "A1", shutdown_callback=lambda: save_seen_jobs_data(seen_sheet, seen_jobs))
@@ -111,6 +110,7 @@ def main():
     if progress["progress"] == "setting":
         set_sheet1()
         set_seen_jobs_data_sheet()
+    sheet1.update([["Running Scrapping"]], "Q2")
     
     while not progress["progress"] == "finished":
         try:
