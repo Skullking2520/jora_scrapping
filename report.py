@@ -82,7 +82,7 @@ def main():
     sheet2 = web_sheet.get_worksheet("Sheet2")
     report_sheet = web_sheet.get_worksheet("ReportData")
     report = load_report_data(report_sheet)
-    sheet2.update("E1", "Running Report")
+    sheet2.update("E1", [["Running Report"]])
     ph = ProcessHandler(process_sheet, {"Processing": False, "UrlNum": 1}, "A3", shutdown_callback=lambda: save_report_data(report_sheet, report))
     progress = ph.load_progress()
     if not progress["Processing"]:
@@ -178,7 +178,7 @@ def main():
     ph.save_progress(progress)
     process_sheet.update("A1", [[json.dumps({"progress":"setting", "UrlNum":1})]])
     process_sheet.update("A2", [[json.dumps({"progress":"setting", "RowNum": 1})]])
-    sheet2.update("E1", "Reporting Finished")
+    sheet2.update("E1", [["Reporting Finished"]])
     driver.quit()
     print("Saved every data into the Google Sheet successfully.")
 
