@@ -171,7 +171,7 @@ def main():
 
     progress["progress"] = "finished"
     ph.save_progress(progress)
-    sheet1.update([["Scrapping Finished"]], "Q1")
+    sheet1.update([["Scrapping Finished"]], "Q2")
     driver.quit()
     print("Saved every data into the Google Sheet successfully.")
 
