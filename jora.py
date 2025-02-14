@@ -102,6 +102,7 @@ def main():
     process_sheet = web_sheet.get_worksheet("Progress")
     sheet1 = web_sheet.get_worksheet("Sheet1")
     seen_sheet = web_sheet.get_worksheet("JobData")
+    sheet1.resize(cols=17)
     sheet1.update([["Running Scrapping"]], "Q2")
     load_to_seen_data()
     seen_jobs = load_seen_jobs_data(seen_sheet)
