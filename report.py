@@ -87,7 +87,7 @@ def main():
     if not progress["Processing"]:
         set_sheet2()
         set_report_sheet()
-    
+        report = load_report_data(report_sheet)
     while True:
         try:
             progress["Processing"] = True
