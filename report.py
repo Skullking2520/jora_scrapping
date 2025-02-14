@@ -82,13 +82,13 @@ def main():
     sheet2 = web_sheet.get_worksheet("Sheet2")
     report_sheet = web_sheet.get_worksheet("ReportData")
     report = load_report_data(report_sheet)
-    sheet2.update([["Running Report"]], "E1")
     ph = ProcessHandler(process_sheet, {"Processing": False, "UrlNum": 1}, "A3", shutdown_callback=lambda: save_report_data(report_sheet, report))
     progress = ph.load_progress()
     if not progress["Processing"]:
         set_sheet2()
         set_report_sheet()
         report = load_report_data(report_sheet)
+    sheet2.update([["Running Report"]], "E1")
     while True:
         try:
             progress["Processing"] = True
