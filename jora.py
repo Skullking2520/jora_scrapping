@@ -201,7 +201,7 @@ def main():
                 except NoSuchElementException:
                     job_listing_date = "No date added given"
 
-                scrap_date = datetime.datetime.now().strftime("%Y-%m-%d")
+                scrap_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
                 try:
                     description = driver.find_element(By.CSS_SELECTOR, "div[class='job-description-container']")
