@@ -110,7 +110,7 @@ def main():
     if progress["progress"] == "setting":
         set_sheet1()
         set_seen_jobs_data_sheet()
-    sheet1.update([["Running Scrapping"]], "Q2")
+    sheet1.update([["Running Scrapping"]], "Q1")
     
     while not progress["progress"] == "finished":
         try:
