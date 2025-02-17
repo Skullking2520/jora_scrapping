@@ -79,7 +79,7 @@ def load_detail_data(worksheet) -> list[list[str]]:
                 continue
     return report
 
-def batch_update_cells(worksheet, row_num, updates):
+def batch_update_cells(worksheet, row_num, updates, retries=3, delay=5):
     sheet_id = getattr(worksheet, 'id', None) or worksheet._properties.get('sheetId')
     requests = []
 
@@ -103,8 +103,21 @@ def batch_update_cells(worksheet, row_num, updates):
         })
 
     body = {"requests": requests}
-    worksheet.spreadsheet.batch_update(body)
 
+    for attempt in range(1, retries + 1):
+        try:
+            worksheet.spreadsheet.batch_update(body)
+            return
+        except gspread.exceptions.APIError as e:
+            if any(code in str(e) for code in ["500", "502", "503", "504", "429"]):
+                print(f"[Retryable] Batch update error: {e}")
+            else:
+                print(f"[Non-retryable] Batch update error: {e}")
+            print(f"Retrying after {delay} seconds (attempt {attempt}/{retries})")
+            time.sleep(delay)
+            delay *= 2
+    raise Exception("Batch update failed after multiple retries")
+    
 def main():
     process_sheet = web_sheet.get_worksheet("Progress")
     sheet1 = web_sheet.get_worksheet("Sheet1")
@@ -168,9 +181,9 @@ def main():
         except NoSuchElementException as e:
                 print(f"Error processing job: {e}")
                 continue
-
-    progress["progress"] = "finished"
-    ph.save_progress(progress)
+            
+    process_sheet.update("A1", [[json.dumps({"progress":"setting", "UrlNum":1})]])
+    process_sheet.update("A2", [[json.dumps({"progress":"setting", "RowNum": 1})]])
     sheet1.update([["Scrapping Finished"]], "Q1")
     driver.quit()
     print("Saved every data into the Google Sheet successfully.")
