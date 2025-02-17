@@ -3,7 +3,7 @@ import datetime
 import os
 import re
 import time
-
+import locale
 import gspread
 import openai
 from selenium.common.exceptions import NoSuchElementException
@@ -12,6 +12,8 @@ from requests import ReadTimeout
 
 from google_form_package import Sheet
 from process_handler import ProcessHandler
+
+locale.setlocale(locale.LC_TIME, 'en_US.UTF-8')
 
 web_sheet = Sheet()
 driver = web_sheet.set_driver()
@@ -107,7 +109,7 @@ def main():
     seen_jobs = load_seen_jobs_data(seen_sheet)
     ph = ProcessHandler(process_sheet, {"progress":"setting", "UrlNum":1}, "A1", shutdown_callback=lambda: save_seen_jobs_data(seen_sheet, seen_jobs))
     progress = ph.load_progress()
-    if progress["progress"] == "setting":
+    if not sheet1.acell("A2").value:
         set_sheet1()
         set_seen_jobs_data_sheet()
     sheet1.update([["Running Scrapping"]], "Q1")
