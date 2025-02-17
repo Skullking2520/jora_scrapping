@@ -97,9 +97,6 @@ def main():
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
             print(f"Current page: {url}")
-           
-
-            print(f"current page: {url}")
             progress["UrlNum"] += 1
 
             jobs = driver.find_elements(By.CSS_SELECTOR, "a[class='job-link -no-underline -desktop-only show-job-description']")
