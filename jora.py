@@ -125,14 +125,6 @@ def main():
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
 
-            try:
-                driver.find_element(By.CSS_SELECTOR, "a[class='next-page-button']")
-            except NoSuchElementException:
-                progress["progress"] = "finished"
-                ph.save_progress(progress)
-                print("Finished scrapping")
-                break
-
             print(f"current page: {url}")
             progress["UrlNum"] += 1
 
@@ -262,6 +254,14 @@ def main():
                 append_row_with_retry(sheet1, job_data)
                 seen_jobs.add((job_title.lower(), company.lower()))
                 time.sleep(1)
+
+            try:
+                driver.find_element(By.CSS_SELECTOR, "a[class='next-page-button']")
+            except NoSuchElementException:
+                progress["progress"] = "finished"
+                ph.save_progress(progress)
+                print("Finished scrapping")
+                break
             
         except NoSuchElementException as e:
             print(f"Error processing job: {e}")
