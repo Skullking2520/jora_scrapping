@@ -16,6 +16,7 @@ from process_handler import ProcessHandler
 from zoneinfo import ZoneInfo
 
 locale.setlocale(locale.LC_TIME, 'en_US.UTF-8')
+malaysia_tz = ZoneInfo("Asia/Kuala_Lumpur")
 
 web_sheet = Sheet()
 driver = web_sheet.set_driver()
