@@ -264,6 +264,7 @@ def main():
                 break
             
         except NoSuchElementException as e:
+            progress["UrlNum"] += 1
             print(f"Error processing job: {e}")
             continue
 
