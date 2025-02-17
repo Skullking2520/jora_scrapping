@@ -13,7 +13,7 @@ from requests import ReadTimeout
 from google_form_package import Sheet
 from process_handler import ProcessHandler
 
-locale.setlocale(locale.LC_TIME, 'en_US.UTF-8')
+locale.setlocale(locale.LC_TIME, 'English_United States')
 
 web_sheet = Sheet()
 driver = web_sheet.set_driver()
