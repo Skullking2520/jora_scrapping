@@ -173,8 +173,6 @@ def main():
     progress["Processing"] = False
     progress["UrlNum"] = 1
     ph.save_progress(progress)
-    process_sheet.update("A1", [[json.dumps({"progress":"setting", "UrlNum":1})]])
-    process_sheet.update("A2", [[json.dumps({"progress":"setting", "RowNum": 1})]])
     sheet2.update([["Reporting Finished"]], "E1")
     driver.quit()
     print("Saved every data into the Google Sheet successfully.")
