@@ -197,12 +197,8 @@ def main():
                     if match:
                         num = int(match.group(1))
                         unit = match.group(2).lower()
-                        if unit == "day":
-                            job_listing_date = now - datetime.timedelta(days=num)
-                        elif unit == "hour":
-                            job_listing_date = now - datetime.timedelta(hours=num)
-                        else:
-                            job_listing_date = "No date added given"
+                        dt = now - datetime.timedelta(days=num) if unit == "day" else now - datetime.timedelta(hours=num)
+                        job_listing_date = dt.strftime("%Y-%m-%d %H:%M:%S")
                     else:
                         job_listing_date = "No date added given"
                 except NoSuchElementException:
