@@ -75,9 +75,6 @@ jobs:
         python jora_detail.py
         
   run-report:
-    needs: 
-      - run-jora
-      - run-jora-detail
     runs-on: ubuntu-latest
 
     steps:
