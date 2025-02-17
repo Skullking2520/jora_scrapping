@@ -13,6 +13,8 @@ from requests import ReadTimeout
 from google_form_package import Sheet
 from process_handler import ProcessHandler
 
+from zoneinfo import ZoneInfo
+
 locale.setlocale(locale.LC_TIME, 'English_United States')
 
 web_sheet = Sheet()
@@ -189,7 +191,7 @@ def main():
 
                 try:
                     raw_date_added_dif = driver.find_element(By.CSS_SELECTOR, "span[class='listed-date']").text
-                    now = datetime.datetime.now()
+                    now = datetime.datetime.now(malaysia_tz)
                     match = re.search(r'(?i)(\d+)\s*(day|hour)s?', raw_date_added_dif)
                     if match:
                         num = int(match.group(1))
@@ -205,7 +207,7 @@ def main():
                 except NoSuchElementException:
                     job_listing_date = "No date added given"
 
-                scrap_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                scrap_date = datetime.datetime.now(malaysia_tz).strftime("%Y-%m-%d %H:%M:%S")
 
                 try:
                     description = driver.find_element(By.CSS_SELECTOR, "div[class='job-description-container']")
