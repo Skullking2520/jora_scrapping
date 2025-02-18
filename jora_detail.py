@@ -1,6 +1,7 @@
 # jora_detail.py
 import re
 import time
+import json
 
 import gspread
 from selenium.common.exceptions import NoSuchElementException
