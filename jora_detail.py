@@ -4,7 +4,7 @@ import time
 import json
 
 import gspread
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC  # noqa
 from requests import ReadTimeout
@@ -149,9 +149,11 @@ def main():
                 time.sleep(2)
 
                 try:
-                    raw_is_from_seek = driver.find_element(By.CSS_SELECTOR,"span[class = 'site']").text
-                    is_from_seek = bool("seek" in raw_is_from_seek)
-                except NoSuchElementException:
+                    raw_is_from_seek = WebDriverWait(driver, 15).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, "span[class='site']"))
+                    ).text
+                    is_from_seek = "seek" in raw_is_from_seek.lower()
+                except (NoSuchElementException, TimeoutException):
                     is_from_seek = False
 
                 try:
