@@ -123,7 +123,7 @@ def main():
     process_sheet = web_sheet.get_worksheet("Progress")
     sheet1 = web_sheet.get_worksheet("Sheet1")
     extracted_list = extract()
-    ph = ProcessHandler(process_sheet, {"progress":"setting", "RowNum": 1}, "A2")
+    ph = ProcessHandler(process_sheet, {"progress":"setting", "RowNum": 0}, "A2")
     progress = ph.load_progress()
     if progress["progress"] == "setting":
         set_detail_sheet()
@@ -156,9 +156,7 @@ def main():
 
                 try:
                     raw_company_website = driver.find_element(By.CSS_SELECTOR,"a[class = 'apply-button rounded-button -primary -size-lg -w-full']")
-                    base_url = "https://au.jora.com"
-                    raw_link = raw_company_website.get_attribute("href")
-                    company_website = base_url + raw_link
+                    company_website = raw_company_website.get_attribute("href")
                 except NoSuchElementException:
                     company_website = "no company website"
 
