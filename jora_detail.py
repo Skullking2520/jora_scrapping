@@ -184,8 +184,8 @@ def main():
                 print(f"Error processing job: {e}")
                 continue
             
-    process_sheet.update("A1", [[json.dumps({"progress":"setting", "UrlNum":1})]])
-    process_sheet.update("A2", [[json.dumps({"progress":"setting", "RowNum": 1})]])
+    process_sheet.update("A1", [[json.dumps({"progress":"setting", "UrlNum": 1})]])
+    process_sheet.update("A2", [[json.dumps({"progress":"setting", "RowNum": 0})]])
     sheet1.update([["Scrapping Finished"]], "Q1")
     driver.quit()
     print("Saved every data into the Google Sheet successfully.")
