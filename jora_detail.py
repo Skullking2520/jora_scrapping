@@ -16,7 +16,7 @@ from process_handler import ProcessHandler
 web_sheet = Sheet()
 driver = web_sheet.set_driver()
 
-def append_row_with_retry(worksheet, data, retries=3, delay=5):
+def append_row_with_retry(worksheet, data, retries=3, delay=65):
     for attempt in range(retries):
         try:
             worksheet.append_row(data, value_input_option="USER_ENTERED")
@@ -25,7 +25,6 @@ def append_row_with_retry(worksheet, data, retries=3, delay=5):
             if any(code in str(e) for code in ["500", "502", "503", "504","429"]) or isinstance(e, ReadTimeout):
                 print(f"Error occurred. Retry after {delay} seconds ({attempt+1}/{retries})")
                 time.sleep(delay)
-                delay *= 2
             else:
                 print(f"Failed to append element {data} after {retries} attempts.")
                 return
