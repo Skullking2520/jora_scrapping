@@ -144,9 +144,13 @@ def main():
                 row_and_index = extracted_list[progress["RowNum"]]
                 row_num = row_and_index["link_row_num"]
                 extracted_url = row_and_index["detail_url"]
-                driver.get(extracted_url)
-                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(2)
+                try:
+                    driver.get(extracted_url)
+                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    time.sleep(2)
+                except:
+                    progress["RowNum"] += 1
+                    continue
 
                 try:
                     raw_is_from_seek = WebDriverWait(driver, 15).until(
