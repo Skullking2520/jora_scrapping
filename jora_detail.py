@@ -80,7 +80,7 @@ def load_detail_data(worksheet) -> list[list[str]]:
                 continue
     return report
 
-def batch_update_cells(worksheet, row_num, updates, retries=3, delay=5):
+def batch_update_cells(worksheet, row_num, updates, retries=3, delay=65):
     sheet_id = getattr(worksheet, 'id', None) or worksheet._properties.get('sheetId')
     requests = []
 
@@ -116,7 +116,6 @@ def batch_update_cells(worksheet, row_num, updates, retries=3, delay=5):
                 print(f"[Non-retryable] Batch update error: {e}")
             print(f"Retrying after {delay} seconds (attempt {attempt}/{retries})")
             time.sleep(delay)
-            delay *= 2
     raise Exception("Batch update failed after multiple retries")
     
 def main():
