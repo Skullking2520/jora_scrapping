@@ -16,6 +16,7 @@ def main():
     process_sheet.update("C2", [[json.dumps({"progress":"setting", "RowNum": 2})]])
     process_sheet.update("D2", [[json.dumps({"progress":"setting", "RowNum": 3})]])
     process_sheet.update("E2", [[json.dumps({"progress":"setting", "RowNum": 4})]])
+    process_sheet.update("A3", [[json.dumps({"progress":"setting", "UrlNum": 1})]])
   
 if __name__ == "__main__":
     main()
