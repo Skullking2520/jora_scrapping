@@ -173,7 +173,7 @@ def main():
     progress["Processing"] = False
     progress["UrlNum"] = 1
     ph.save_progress(progress)
-    sheet2.update([["Reporting Finished"]], "E1")
+    
     driver.quit()
     print("Saved every data into the Google Sheet successfully.")
 
