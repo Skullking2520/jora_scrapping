@@ -119,12 +119,13 @@ def batch_update_all_cells(worksheet, update_requests, retries=3, delay=65):
 def main():
     process_sheet = web_sheet.get_worksheet("Progress")
     sheet1 = web_sheet.get_worksheet("Sheet1")
+    all_sheet_data = sheet1.get_all_values()
     extracted_list = extract()
     ph = ProcessHandler(process_sheet, {"progress":"setting", "RowNum": 3}, "D2")
     progress = ph.load_progress()
     if progress["progress"] == "setting":
         set_detail_sheet()
-    sheet1_header = sheet1.row_values(1)
+    sheet1_header = all_sheet_data[0]
     try:
         col_company_website = sheet1_header.index("company website") + 1
         col_is_active = sheet1_header.index("is active") + 1
@@ -143,8 +144,8 @@ def main():
                 row_and_index = extracted_list[progress["RowNum"]]
                 row_num = row_and_index["link_row_num"]
                 extracted_url = row_and_index["detail_url"]
-
-                existing_row = sheet1.row_values(row_num)
+                existing_row = all_sheet_data[row_num - 1]
+                
                 if existing_row[col_is_from_seek - 1].strip():
                     full_update_needed = False
                 else:
