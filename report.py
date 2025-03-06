@@ -82,16 +82,16 @@ def main():
     sheet2 = web_sheet.get_worksheet("Sheet2")
     report_sheet = web_sheet.get_worksheet("ReportData")
     report = load_report_data(report_sheet)
-    ph = ProcessHandler(process_sheet, {"Processing": False, "UrlNum": 1}, "A3", shutdown_callback=lambda: save_report_data(report_sheet, report))
+    ph = ProcessHandler(process_sheet, "progress":"setting", "UrlNum": 0}, "A3", shutdown_callback=lambda: save_report_data(report_sheet, report))
     progress = ph.load_progress()
-    if not progress["Processing"]:
+    if progress["progress"] == "setting":
         set_sheet2()
         set_report_sheet()
         report = load_report_data(report_sheet)
     sheet2.update([["Running Report"]], "E1")
-    while True:
+    while not progress["progress"] == "finished":
         try:
-            progress["Processing"] = True
+            progress["progress"] = "processing"
             url = f"https://au.jora.com/j?a=24h&l=Victoria&nofollow=true&p={progress['UrlNum']}&q=&r=0&sp=facet_distance&surl=0&tk=DE7LtoGm3BJx78CQKKAl-x1Ir1keUvqhw6PY4ybZ7"
             driver.get(url)
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -170,8 +170,7 @@ def main():
         append_row_with_retry(sheet2, row)
 
     save_report_data(report_sheet, report)
-    progress["Processing"] = False
-    progress["UrlNum"] = 1
+    progress["progress"] = "finished"
     ph.save_progress(progress)
     
     driver.quit()
