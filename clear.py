@@ -7,7 +7,7 @@ def main():
     web_sheet = Sheet()
     sheet1 = web_sheet.get_worksheet("Sheet1")
     sheet2 = web_sheet.get_worksheet("Sheet2")
-    progress_sheet = web_sheet.get_worksheet("Progress")
+    process_sheet = web_sheet.get_worksheet("Progress")
     sheet1.update([["Scrapping Finished"]], "Q1")
     sheet2.update([["Reporting Finished"]], "E1")
     process_sheet.update("A1", [[json.dumps({"progress":"setting", "UrlNum": 1})]])
