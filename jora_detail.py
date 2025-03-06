@@ -80,31 +80,29 @@ def load_detail_data(worksheet) -> list[list[str]]:
                 continue
     return report
 
-def batch_update_cells(worksheet, row_num, updates, retries=3, delay=65):
+def batch_update_all_cells(worksheet, update_requests, retries=3, delay=65):
     sheet_id = getattr(worksheet, 'id', None) or worksheet._properties.get('sheetId')
     requests = []
-
-    for col, value in updates:
-        requests.append({
-            "updateCells": {
-                "range": {
-                    "sheetId": sheet_id,
-                    "startRowIndex": row_num - 1,
-                    "endRowIndex": row_num,
-                    "startColumnIndex": col - 1,
-                    "endColumnIndex": col
-                },
-                "rows": [{
-                    "values": [{
-                        "userEnteredValue": {"stringValue": str(value)}
-                    }]
-                }],
-                "fields": "userEnteredValue"
-            }
-        })
-
+    for row_num, updates in update_requests:
+        for col, value in updates:
+            requests.append({
+                "updateCells": {
+                    "range": {
+                        "sheetId": sheet_id,
+                        "startRowIndex": row_num - 1,
+                        "endRowIndex": row_num,
+                        "startColumnIndex": col - 1,
+                        "endColumnIndex": col
+                    },
+                    "rows": [{
+                        "values": [{
+                            "userEnteredValue": {"stringValue": str(value)}
+                        }]
+                    }],
+                    "fields": "userEnteredValue"
+                }
+            })
     body = {"requests": requests}
-
     for attempt in range(1, retries + 1):
         try:
             worksheet.spreadsheet.batch_update(body)
@@ -135,7 +133,9 @@ def main():
     except ValueError:
         print("Column not in sheet")
         return
-
+        
+    update_requests = []
+    BATCH_SIZE = 20
     while not progress["progress"] == "finished":
         try:
             progress["progress"] = "processing"
@@ -143,52 +143,77 @@ def main():
                 row_and_index = extracted_list[progress["RowNum"]]
                 row_num = row_and_index["link_row_num"]
                 extracted_url = row_and_index["detail_url"]
+
+                existing_row = sheet1.row_values(row_num)
+                if existing_row[col_is_from_seek - 1].strip():
+                    full_update_needed = False
+                else:
+                    full_update_needed = True
+
                 try:
                     driver.get(extracted_url)
                     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                     time.sleep(2)
-                except:
-                    progress["RowNum"] += 1
+                except Exception as e:
+                    print(f"Error loading url {extracted_url}: {e}")
+                    progress["RowNum"] += 5
                     continue
 
                 try:
-                    raw_is_from_seek = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, "span[class='site']"))
+                    raw_is_active = driver.find_element(
+                        By.CSS_SELECTOR, "div[class = 'flash-container error']"
                     ).text
-                    is_from_seek = "seek" in raw_is_from_seek.lower()
-                except (NoSuchElementException, TimeoutException):
-                    is_from_seek = False
-
-                try:
-                    raw_company_website = driver.find_element(By.CSS_SELECTOR,"a[class = 'apply-button rounded-button -primary -size-lg -w-full']")
-                    company_website = raw_company_website.get_attribute("href")
-                except NoSuchElementException:
-                    company_website = "no company website"
-
-                try:
-                    raw_is_active = driver.find_element(By.CSS_SELECTOR,"div[class = 'flash-container error']").text
                     is_active = not bool("This job is no longer available" in raw_is_active)
                 except NoSuchElementException:
                     is_active = True
 
-                if is_from_seek:
-                    seek_link = company_website
-                    company_website = ""
+                if full_update_needed:
+                    try:
+                        raw_is_from_seek = WebDriverWait(driver, 15).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, "span[class='site']"))
+                        ).text
+                        is_from_seek = "seek" in raw_is_from_seek.lower()
+                    except (NoSuchElementException, TimeoutException):
+                        is_from_seek = False
+    
+                    try:
+                        raw_company_website = driver.find_element(By.CSS_SELECTOR,"a[class = 'apply-button rounded-button -primary -size-lg -w-full']")
+                        company_website = raw_company_website.get_attribute("href")
+                    except NoSuchElementException:
+                        company_website = "no company website"
+    
+                    if is_from_seek:
+                        seek_link = company_website
+                        company_website = ""
+                    else:
+                        seek_link = ""
+
+                    updates = [(col_company_website, company_website),
+                               (col_is_active, "Active" if is_active else "Inactive"),
+                               (col_seek_link, seek_link),
+                               (col_is_from_seek, str(is_from_seek))
+                              ]
                 else:
-                    seek_link = ""
+                    updates = [(col_is_active, "Active" if is_active else "Inactive")]
+                    
+                update_requests.append((row_num, updates))
+                progress["RowNum"] += 5
 
-                updates = [(col_company_website, company_website),(col_is_active, "Active" if is_active else "Inactive"),(col_seek_link, seek_link),(col_is_from_seek, str(is_from_seek))]
-                batch_update_cells(sheet1, row_num, updates)
+                if len(update_requests) >= BATCH_SIZE:
+                    batch_update_all_cells(sheet1, update_requests)
+                    update_requests = []
+                    ph.save_progress(progress)
 
-                progress["RowNum"] += 1
+            if update_requests:
+                batch_update_all_cells(sheet1, update_requests)
+                update_requests = []
+                
             progress["progress"] = "finished"
+            ph.save_progress(progress)
         except NoSuchElementException as e:
                 print(f"Error processing job: {e}")
                 continue
             
-    process_sheet.update("A1", [[json.dumps({"progress":"setting", "UrlNum": 1})]])
-    process_sheet.update("A2", [[json.dumps({"progress":"setting", "RowNum": 0})]])
-    sheet1.update([["Scrapping Finished"]], "Q1")
     driver.quit()
     print("Saved every data into the Google Sheet successfully.")
 
