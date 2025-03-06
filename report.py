@@ -82,7 +82,7 @@ def main():
     sheet2 = web_sheet.get_worksheet("Sheet2")
     report_sheet = web_sheet.get_worksheet("ReportData")
     report = load_report_data(report_sheet)
-    ph = ProcessHandler(process_sheet, "progress":"setting", "UrlNum": 0}, "A3", shutdown_callback=lambda: save_report_data(report_sheet, report))
+    ph = ProcessHandler(process_sheet, {"progress":"setting", "UrlNum": 0}, "A3", shutdown_callback=lambda: save_report_data(report_sheet, report))
     progress = ph.load_progress()
     if progress["progress"] == "setting":
         set_sheet2()
