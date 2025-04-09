@@ -64,7 +64,7 @@ def append_row_with_retry(worksheet, data, retries=3, delay=5):
 def set_sheet1():
     worksheet = web_sheet.get_worksheet("Sheet1")
     worksheet.clear()
-    worksheet.append_row(["job code", "job title", "job link", "company", "location", "salary", "job type", "etc", "company website", "is from seek", "seek link", "scrap date", "job listing date", "is active", "job category", "description"])
+    worksheet.append_row(["job code", "job title", "job link", "company", "location", "salary", "job type", "etc", "company website", "is from seek", "seek link", "scrap date", "job listing date", "is active", "job category", "description", "skills"])
     return worksheet
 
 def set_seen_jobs_data_sheet():
@@ -115,7 +115,7 @@ def main():
     if not sheet1.acell("A2").value:
         set_sheet1()
         set_seen_jobs_data_sheet()
-    sheet1.update([["Running Scrapping"]], "Q1")
+    sheet1.update([["Running Scrapping"]], "S1")
     
     while not progress["progress"] == "finished":
         try:
