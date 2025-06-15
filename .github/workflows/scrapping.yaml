@@ -1,233 +1,233 @@
-name: Run Scrapping
+# name: Run Scrapping
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-  schedule:
-    - cron: '0 15 * * *'
+# on:
+#   push:
+#     branches:
+#       - main
+#   workflow_dispatch:
+#   schedule:
+#     - cron: '0 15 * * *'
 
-jobs:
-  run-jora:
-    runs-on: ubuntu-latest
+# jobs:
+#   run-jora:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
+#     - name: Set up Python
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: "3.x"
 
-    - name: Install Google Chrome
-      run: |
-        set -ex
-        sudo apt-get update -y
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo apt install -y ./google-chrome-stable_current_amd64.deb
-        sudo apt-get install -y -f
+#     - name: Install Google Chrome
+#       run: |
+#         set -ex
+#         sudo apt-get update -y
+#         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+#         sudo apt install -y ./google-chrome-stable_current_amd64.deb
+#         sudo apt-get install -y -f
 
-    - name: setup-chromedriver
-      uses: nanasess/setup-chromedriver@v2.3.0
+#     - name: setup-chromedriver
+#       uses: nanasess/setup-chromedriver@v2.3.0
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install -r requirements.txt
 
-    - name: Run Scrapping
-      env:
-        SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      run: |
-        python jora.py
+#     - name: Run Scrapping
+#       env:
+#         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+#         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+#       run: |
+#         python jora.py
         
-  run-jora-detail:
-    needs: 
-      - run-jora
-    runs-on: ubuntu-latest
+#   run-jora-detail:
+#     needs: 
+#       - run-jora
+#     runs-on: ubuntu-latest
     
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v3
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
+#     - name: Set up Python
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: "3.x"
     
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install -r requirements.txt
     
-    - name: Run occ_vac compiling
-      env:
-        SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-      run: |
-        python jora_detail.py
+#     - name: Run occ_vac compiling
+#       env:
+#         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+#       run: |
+#         python jora_detail.py
         
-  run-jora-detail-2:
-    needs: 
-      - run-jora
-    runs-on: ubuntu-latest
+#   run-jora-detail-2:
+#     needs: 
+#       - run-jora
+#     runs-on: ubuntu-latest
     
-    steps:
-    - name: Wait for 30 seconds
-      run: sleep 30
+#     steps:
+#     - name: Wait for 30 seconds
+#       run: sleep 30
         
-    - name: Checkout repository
-      uses: actions/checkout@v3
+#     - name: Checkout repository
+#       uses: actions/checkout@v3
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
+#     - name: Set up Python
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: "3.x"
     
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install -r requirements.txt
     
-    - name: Run occ_vac compiling
-      env:
-        SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-      run: |
-        python jora_detail_2.py
+#     - name: Run occ_vac compiling
+#       env:
+#         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+#       run: |
+#         python jora_detail_2.py
         
-  run-jora-detail-3:
-    needs: 
-      - run-jora
-    runs-on: ubuntu-latest
+#   run-jora-detail-3:
+#     needs: 
+#       - run-jora
+#     runs-on: ubuntu-latest
     
-    steps:
-    - name: Wait for 60 seconds
-      run: sleep 60
+#     steps:
+#     - name: Wait for 60 seconds
+#       run: sleep 60
         
-    - name: Checkout repository
-      uses: actions/checkout@v3
+#     - name: Checkout repository
+#       uses: actions/checkout@v3
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
+#     - name: Set up Python
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: "3.x"
     
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install -r requirements.txt
     
-    - name: Run occ_vac compiling
-      env:
-        SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-      run: |
-        python jora_detail_3.py
+#     - name: Run occ_vac compiling
+#       env:
+#         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+#       run: |
+#         python jora_detail_3.py
         
-  run-jora-detail-4:
-    needs: 
-      - run-jora
-    runs-on: ubuntu-latest
+#   run-jora-detail-4:
+#     needs: 
+#       - run-jora
+#     runs-on: ubuntu-latest
     
-    steps:
-    - name: Wait for 90 seconds
-      run: sleep 90
+#     steps:
+#     - name: Wait for 90 seconds
+#       run: sleep 90
         
-    - name: Checkout repository
-      uses: actions/checkout@v3
+#     - name: Checkout repository
+#       uses: actions/checkout@v3
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
+#     - name: Set up Python
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: "3.x"
     
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install -r requirements.txt
     
-    - name: Run occ_vac compiling
-      env:
-        SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-      run: |
-        python jora_detail_4.py
+#     - name: Run occ_vac compiling
+#       env:
+#         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+#       run: |
+#         python jora_detail_4.py
         
-  run-jora-detail-5:
-    needs: 
-      - run-jora
-    runs-on: ubuntu-latest
+#   run-jora-detail-5:
+#     needs: 
+#       - run-jora
+#     runs-on: ubuntu-latest
     
-    steps:
-    - name: Wait for 120 seconds
-      run: sleep 120
+#     steps:
+#     - name: Wait for 120 seconds
+#       run: sleep 120
         
-    - name: Checkout repository
-      uses: actions/checkout@v3
+#     - name: Checkout repository
+#       uses: actions/checkout@v3
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
+#     - name: Set up Python
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: "3.x"
     
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install -r requirements.txt
     
-    - name: Run occ_vac compiling
-      env:
-        SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-      run: |
-        python jora_detail_5.py
+#     - name: Run occ_vac compiling
+#       env:
+#         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+#       run: |
+#         python jora_detail_5.py
         
-  run-report:
-    runs-on: ubuntu-latest
+#   run-report:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
+#     - name: Set up Python
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: "3.x"
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install -r requirements.txt
 
-    - name: Run Report
-      env:
-        SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-      run: |
-        python report.py
+#     - name: Run Report
+#       env:
+#         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+#       run: |
+#         python report.py
         
-  run-clear:
-    needs:
-      - run-jora-detail
-      - run-jora-detail-2
-      - run-jora-detail-3
-      - run-jora-detail-4
-      - run-jora-detail-5
-      - run-report
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Run clear
-        env:
-          SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-        run: |
-          python clear.py
+#   run-clear:
+#     needs:
+#       - run-jora-detail
+#       - run-jora-detail-2
+#       - run-jora-detail-3
+#       - run-jora-detail-4
+#       - run-jora-detail-5
+#       - run-report
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+#       - name: Set up Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: "3.x"
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r requirements.txt
+#       - name: Run clear
+#         env:
+#           SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+#         run: |
+#           python clear.py
     
 
