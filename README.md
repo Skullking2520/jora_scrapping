@@ -10,10 +10,10 @@ Seeka Technology 소프트웨어 개발 인턴 업무로 진행했습니다. 인
 
 | 단계 | 코드 | 역할 |
 | --- | --- | --- |
-| 목록 수집 | [jora.py](jora.py) | 공고 목록 수집, 직무명·회사명 조합을 사용한 중복 관리, 진행상태 저장 |
-| 상세 수집 | [jora_detail.py](jora_detail.py) 및 번호별 후속 파일 | 공고 상세 정보 수집·적재 |
-| 후처리 | [report.py](report.py), [clear.py](clear.py) | 수집 결과 처리와 정리 |
-| 시트 연결 | [google_form_package.py](google_form_package.py) | Google Sheets 연결 |
+| 목록 수집 | [jora.py](scripts/jora.py) | 공고 목록 수집, 직무명·회사명 조합을 사용한 중복 관리, 진행상태 저장 |
+| 상세 수집 | [jora_detail.py](scripts/jora_detail.py) 및 번호별 후속 파일 | 공고 상세 정보 수집·적재 |
+| 후처리 | [report.py](scripts/report.py), [clear.py](scripts/clear.py) | 수집 결과 처리와 정리 |
+| 시트 연결 | [google_form_package.py](scripts/google_form_package.py) | Google Sheets 연결 |
 
 OpenAI API를 사용하는 정보 구조화 코드가 포함돼 있습니다. 스프레드시트 API 호출에는 재시도와 대기를 적용했습니다.
 
@@ -28,7 +28,7 @@ OpenAI API를 사용하는 정보 구조화 코드가 포함돼 있습니다. �
 python -m pip install -r requirements.txt
 ```
 
-기존 실행 순서와 인증 파일 생성 방식은 [workflow 기록](.github/workflows/scrapping.yaml)에 있습니다. 목록 수집 후 해당 시트를 입력으로 상세 수집을 진행하므로, 단계별 입력·출력 시트를 먼저 맞춰야 합니다.
+과거 실행 순서는 [workflow 기록](.github/workflows/scrapping.yaml)에 있습니다. 목록 수집 후 해당 시트를 입력으로 상세 수집을 진행하므로, 단계별 입력·출력 시트를 먼저 맞춰야 합니다.
 
 ## 현재 자동화 설정
 
@@ -38,18 +38,6 @@ python -m pip install -r requirements.txt
 
 중복 공고 제외, 재시도, 진행상태 저장·복구, 목록과 상세 수집의 분리를 중심으로 볼 수 있습니다. 번호별 상세 수집 파일은 독립 프로젝트가 아니라 같은 수집 업무를 나눈 구성입니다.
 
-
-## 파일을 읽는 순서
-
-| 시작 파일 | 역할 |
-| --- | --- |
-| [jora.py](<jora.py>) | 목록 수집·중복 확인 |
-| [jora_detail.py](<jora_detail.py>) | 상세 정보 수집 |
-| [report.py](<report.py>) | 집계·보고 |
-| [clear.py](<clear.py>) | 시트 정리 |
-
-전체 파일과 분할 스크립트는 [구조 안내](docs/STRUCTURE.md)에 정리했습니다.
-
 ## 인증과 저장 대상
 
 `SERVICE_ACCOUNT_KEY`에는 Google 서비스 계정 JSON을, `SPREADSHEET_URL`에는 본인이 관리하는 테스트 시트 URL을 환경 변수로 설정합니다. `.env.example`은 변수 목록이며 자동으로 로드되지 않습니다. 셸에서 환경 변수를 설정한 후 실행해야 합니다. 기존 업무 시트 주소와 인증 파일 저장을 제거했으므로 새 저장 대상을 먼저 지정해야 합니다.
@@ -58,4 +46,14 @@ python -m pip install -r requirements.txt
 
 ## 저장소 관리
 
-실행 결과·인증 파일은 버전 관리에서 제외합니다. 공개 소스와 수집 데이터의 공개 범위는 구분하며, 인턴 업무 데이터·시트 접근 권한은 포함하지 않습니다. 보안 관련 내용은 [관리 기준](SECURITY.md)을 참고하세요.
+실행 결과·인증 파일은 버전 관리에서 제외합니다. 공개 소스와 수집 데이터의 공개 범위는 구분하며, 인턴 업무 데이터·시트 접근 권한은 포함하지 않습니다. 현재 파일의 제외 규칙은 이미 추적된 자료나 과거 커밋의 노출을 제거하지 않습니다.
+
+## 저장소 구성
+
+이번 정리에서 실행 코드와 보조 모듈을 `scripts/`로 옮겼습니다. 번호별 작업 구간과 기존 처리 로직은 유지합니다. 의존성과 설정 예시는 루트에 두며, 실행 명령의 기준 경로는 저장소 루트입니다.
+
+설정과 입력 시트를 준비한 뒤 시작 단계만 실행하는 예:
+
+```bash
+python scripts/jora.py
+```

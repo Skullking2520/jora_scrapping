@@ -43,7 +43,7 @@
 #         SPREADSHEET_URL: ${{ secrets.SPREADSHEET_URL }}
 #         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 #       run: |
-#         python jora.py
+#         python scripts/jora.py
         
 #   run-jora-detail:
 #     needs: 
@@ -69,7 +69,7 @@
 #         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
 #         SPREADSHEET_URL: ${{ secrets.SPREADSHEET_URL }}
 #       run: |
-#         python jora_detail.py
+#         python scripts/jora_detail.py
         
 #   run-jora-detail-2:
 #     needs: 
@@ -98,7 +98,7 @@
 #         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
 #         SPREADSHEET_URL: ${{ secrets.SPREADSHEET_URL }}
 #       run: |
-#         python jora_detail_2.py
+#         python scripts/jora_detail_2.py
         
 #   run-jora-detail-3:
 #     needs: 
@@ -127,7 +127,7 @@
 #         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
 #         SPREADSHEET_URL: ${{ secrets.SPREADSHEET_URL }}
 #       run: |
-#         python jora_detail_3.py
+#         python scripts/jora_detail_3.py
         
 #   run-jora-detail-4:
 #     needs: 
@@ -156,7 +156,7 @@
 #         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
 #         SPREADSHEET_URL: ${{ secrets.SPREADSHEET_URL }}
 #       run: |
-#         python jora_detail_4.py
+#         python scripts/jora_detail_4.py
         
 #   run-jora-detail-5:
 #     needs: 
@@ -185,7 +185,7 @@
 #         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
 #         SPREADSHEET_URL: ${{ secrets.SPREADSHEET_URL }}
 #       run: |
-#         python jora_detail_5.py
+#         python scripts/jora_detail_5.py
         
 #   run-report:
 #     runs-on: ubuntu-latest
@@ -209,7 +209,7 @@
 #         SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
 #         SPREADSHEET_URL: ${{ secrets.SPREADSHEET_URL }}
 #       run: |
-#         python report.py
+#         python scripts/report.py
         
 #   run-clear:
 #     needs:
@@ -236,4 +236,4 @@
 #           SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
 #           SPREADSHEET_URL: ${{ secrets.SPREADSHEET_URL }}
 #         run: |
-#           python clear.py
+#           python scripts/clear.py
